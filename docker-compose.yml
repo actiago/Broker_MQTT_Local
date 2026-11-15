@@ -1,0 +1,49 @@
+# Broker MQTT local — Framework LoRa MQTT (Cobertura) / FEE247-WissTek-IoT
+#
+# Sobe o Eclipse Mosquitto 2 na própria máquina, na porta 1883, acessível pelo
+# N3 (Python) e pelo Gateway (ESP32) na mesma rede Wi-Fi.
+#
+# Funciona igual no Docker Compose v2 (`docker compose`) e no Podman
+# (`podman compose` ou `podman-compose`). O dia a dia está no ./broker.sh:
+#
+#   ./broker.sh up      sobe e valida
+#   ./broker.sh teste   publica e recebe por QoS 1 (sem precisar de cliente no host)
+#   ./broker.sh down    para (o volume de dados é mantido)
+#
+# Configuração do broker:  mosquitto/mosquitto.conf
+# Parâmetros do framework: 4_N4_Armazenamento/Parametros/MQTT.txt (do framework)
+
+services:
+  broker:
+    image: docker.io/library/eclipse-mosquitto:2
+    container_name: broker-mqtt-local
+    restart: unless-stopped
+
+    # 1883: MQTT puro — é a porta que o N3 e o ESP32 usam (MQTT_PORT = 1883).
+    # Sem "127.0.0.1:" na frente para aceitar conexões da LAN (o ESP32 não
+    # alcança o localhost da máquina).
+    ports:
+      - "1883:1883"
+
+    volumes:
+      # Configuração: somente leitura (o container não deve reescrevê-la)
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      # Persistência (persistence true): volume gerenciado pelo engine, criado
+      # com o dono certo. Não use pasta do host aqui: o Mosquitto roda como
+      # usuário "mosquitto" (uid 1883) e escreveria com permissão negada.
+      - dados:/mosquitto/data
+
+    # "O container está de pé?" ≠ "o broker responde". Este teste publica uma
+    # mensagem de QoS 0 num tópico particular e falha se a porta não atender.
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - mosquitto_pub -h 127.0.0.1 -p 1883 -t hc/broker-mqtt-local -m ok -q 0 || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  dados:
+    name: broker-mqtt-local-dados

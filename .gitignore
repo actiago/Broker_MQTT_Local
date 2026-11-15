@@ -1,0 +1,7 @@
+# O estado do broker vive no volume gerenciado pelo engine (broker-mqtt-local-dados).
+# Se você criar overrides locais ou apontar volumes para dentro do repositório,
+# eles não devem entrar no git:
+
+*.log
+.env
+dados/
