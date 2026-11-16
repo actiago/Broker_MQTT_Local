@@ -67,7 +67,7 @@ serviço `systemd`: o broker vive dentro do container.
 ## 3. Início rápido
 
 ```bash
-cd /home/tiago/projetos/github/LoRa/Broker_MQTT_Local
+git clone <este-repositorio> && cd Broker_MQTT_Local   # ou entre na pasta onde ele está
 
 ./broker.sh up      # sobe (o primeiro "up" baixa a imagem eclipse-mosquitto:2)
 ./broker.sh teste   # publica e recebe por QoS 1 dentro do container
@@ -103,6 +103,57 @@ podman compose down
 
 O que **não** foi testado aqui: o sketch e a placa ESP32 (sem hardware) — isso é o
 ensaio de campo, com o `MQTT_BROKER` do sketch apontando para o IP da máquina.
+
+> **Se este repositório não estiver ao lado do framework:** `apontar_framework.sh`
+> assume `../Framework_LoRa_MQTT_Cobertura_v2/Framework_LoRa_MQTT_Survey` por padrão.
+> Fora dessa vizinhança, passe o caminho explicitamente:
+> `./apontar_framework.sh --framework /caminho/do/Framework_LoRa_MQTT_Survey --gravar`
+> (ou exporte `FRAMEWORK=`). O `broker.sh` não depende disso — ele só sobe o container.
+
+### Firewall: libere a porta para a LAN (senão só o próprio PC acessa)
+
+O container roda em **podman rootless**: a porta publicada é atendida por um
+processo do `rootlessport` no espaço de rede do host. Consequência prática: as
+conexões que vêm **de fora** (o ESP32) passam pela cadeia `input` do firewall do
+PC, e um `policy drop` derruba tudo em silêncio — o ESP32 só vê timeout, enquanto
+o Python no mesmo PC continua funcionando por *loopback*.
+
+Sintoma típico: `./broker.sh status` diz "porta 1883 respondendo", o
+`./rodar.sh broker` (Python) testa OK, mas o gateway nunca aparece no broker.
+
+Com nftables (exemplo com `policy drop` na entrada):
+
+```
+chain input {
+    type filter hook input priority 0; policy drop;
+    ct state established,related accept
+    iifname "lo" accept
+    ip protocol icmp accept
+    ip saddr 192.168.0.0/24 tcp dport 1883 accept   # Mosquitto para a LAN
+}
+```
+
+Aplicar sem reiniciar:
+
+```bash
+sudo nft add rule inet filter input ip saddr 192.168.0.0/24 tcp dport 1883 accept
+```
+
+Persistir: incluir a linha em `/etc/nftables.conf` e recarregar com
+`sudo nft -f /etc/nftables.conf` (o arquivo já começa com `flush ruleset`, então
+é idempotente — e é ele que roda no boot, pois o serviço está `enabled`).
+
+Para provar que os pacotes chegam, use um contador: `sudo nft add rule inet
+filter input ip saddr 192.168.0.0/24 tcp dport 1883 counter accept` e depois
+`sudo nft list ruleset` — o contador tem que subir quando a placa tentar conectar.
+
+Com ufw seria `sudo ufw allow from 192.168.0.0/24 to any port 1883 proto tcp`.
+
+> Laboratório: esta liberação deixa o broker **anônimo** visível para toda a
+> sub-rede. Para apertar depois: reservar o IP do gateway no DHCP e liberar só
+> ele (`ip saddr 192.168.0.150 tcp dport 1883 accept`) ou colocar usuário/senha no
+> `mosquitto/mosquitto.conf` (aí o sketch e o Python também precisam das
+> credenciais).
 
 ---
 
