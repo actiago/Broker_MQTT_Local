@@ -1,0 +1,43 @@
+# EditorConfig — https://editorconfig.org
+#
+# Consistência para quem edita, independente do editor: indentação, fim de
+# arquivo e fim de linha. O git normaliza o que entra no repositório
+# (.gitattributes); aqui é a vez do seu editor.
+#
+# Atenção ao par com .gitattributes: os .sh são LF (senão o bash do Linux/WSL
+# falha com "bad interpreter") e os .bat/.ps1 são CRLF (o cmd.exe não gosta de
+# LF em blocos if/for, e o Windows PowerShell 5.1 precisa do BOM).
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{md,markdown}]
+# markdown usa dois espaços no fim da linha como quebra de linha dura
+trim_trailing_whitespace = false
+indent_size = 2
+
+[*.{yml,yaml}]
+indent_size = 2
+
+[*.{sh,bash}]
+indent_size = 4
+
+[*.conf]
+indent_size = 4
+
+[*.{bat,cmd}]
+end_of_line = crlf
+charset = utf-8
+
+[*.ps1]
+end_of_line = crlf
+# BOM UTF-8: sem ele o Windows PowerShell 5.1 lê o arquivo como ANSI e os
+# acentos das mensagens saem quebrados (ferramentas/verificar_ps1_bom.sh confere).
+charset = utf-8-bom

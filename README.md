@@ -41,10 +41,10 @@ Saída esperada (a primeira execução demora mais, baixando a imagem):
 [broker.sh] engine: podman-compose
 [broker.sh] porta 1883 respondendo em 127.0.0.1.
 [SELFTEST] broker respondendo em 1883 (QoS 1) — ok
-[broker.sh] broker no ar: mqtt://192.168.0.105:1883 (anônimo — rede de laboratório)
+[broker.sh] broker no ar: mqtt://192.168.0.10:1883 (anônimo — rede de laboratório)
 ```
 
-(No exemplo acima, `192.168.0.105` é só ilustração — o seu IP é o que o
+(No exemplo acima, `192.168.0.10` é só ilustração — o seu IP é o que o
 `./broker.sh ip` mostrar.)
 
 ### Windows
@@ -74,9 +74,16 @@ comuns: [`windows/README_WINDOWS.md`](windows/README_WINDOWS.md).
 | `apontar_framework.sh` | grava broker/porta no `MQTT.txt` do framework (**dry-run** por padrão) |
 | `windows/` | a mesma coisa no Windows: `broker.bat`, `broker.ps1`, `README_WINDOWS.md` e a alternativa com Mosquitto nativo |
 | `CHANGELOG.md` | histórico do repositório |
+| `.editorconfig` · `.gitattributes` | fim de linha e indentação iguais para todo mundo (LF nos `.sh`, CRLF nos `.bat`/`.ps1`) |
+| `.pre-commit-config.yaml` · `ferramentas/` | hooks de qualidade para quem mexe no projeto (shellcheck, fim de arquivo, BOM do `.ps1`) |
 
 Os volumes são gerenciados pelo engine: `broker-mqtt-local-dados` guarda o
 `/mosquitto/data` para que a persistência do Mosquitto funcione.
+
+> **Para quem usa o broker:** nada de `.pre-commit-config.yaml` / `ferramentas/` é
+> necessário — são ferramentas de manutenção do repositório. Se um dia você
+> contribuir: `pipx install pre-commit && pre-commit install`, depois
+> `pre-commit run --all-files`.
 
 ---
 
@@ -187,7 +194,7 @@ O framework lê o broker do arquivo
 Duas formas de trocar — a segunda é a que preserva tudo:
 
 **a) pela tela** — `./rodar.sh setup` → campo **URL do Broker** (é um Combobox,
-aceita digitar) → `192.168.0.105` → porta `1883` → **CONFIGURA MQTT** →
+aceita digitar) → `192.168.0.10` → porta `1883` → **CONFIGURA MQTT** →
 **INICIAR**. O campo de tópicos já vem com `mot_mqtt_194104/...`.
 
 **b) por script** — mostra o antes/depois e só grava com `--gravar`:

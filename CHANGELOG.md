@@ -7,6 +7,30 @@ numeração acompanha o [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não publicado]
 
+### Adicionado
+
+- `.editorconfig` — indentação, `charset` e fim de linha por tipo de arquivo
+  (LF nos `.sh`/`.yml`, CRLF + BOM no `.ps1`, CRLF no `.bat`), em par com o
+  `.gitattributes`.
+- `.pre-commit-config.yaml` — hooks de manutenção: `trailing-whitespace`,
+  `end-of-file-fixer`, `mixed-line-ending` (ignorando `windows/*.bat|ps1`),
+  `check-yaml`, `check-added-large-files`, `detect-private-key`, `shellcheck`
+  (severidade `warning`) e dois hooks locais.
+- `ferramentas/verificar_ps1_bom.sh` — hook local que exige o BOM UTF-8 nos
+  `.ps1` (sem ele o Windows PowerShell 5.1 lê o arquivo como ANSI); tem modo
+  `--fix`.
+- `ferramentas/verificar_mosquitto_conf.sh` — hook local que impede ativar
+  `password_file`/`per_listener_settings` sem querer: o N3 e o sketch não
+  enviam credenciais, e o laço pararia em silêncio.
+
+### Alterado
+
+- Exemplos de IP na documentação passam a usar `192.168.0.10` em vez do IP real
+  da máquina de desenvolvimento (o repositório é público).
+- `broker.sh`: `# shellcheck disable=SC2016` nos dois pontos em que
+  `$SYS/broker/version` é literal de propósito, para o `shellcheck` sair limpo em
+  qualquer severidade.
+
 ## [1.1.0] — 2026-11-17
 
 ### Adicionado

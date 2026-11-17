@@ -1,0 +1,69 @@
+# Hooks de qualidade — ferramenta de MANUTENÇÃO do repositório.
+#
+# Para usar o broker (subir, testar, apontar o framework) nada disto é
+# necessário: veja o README.
+#
+# Instalar uma vez:
+#   pipx install pre-commit          # ou: python3 -m pip install --user pre-commit
+#   pre-commit install               # ativa em .git/hooks/pre-commit
+#
+# Rodar em todos os arquivos (inclusive agora):
+#   pre-commit run --all-files
+#
+# O pre-commit só examina os arquivos alterados no commit; os hooks marcam o
+# arquivo quando o corrigem, então confira `git diff` e comite de novo.
+
+minimum_pre_commit_version: '3.0.0'
+
+repos:
+  # ---------------------------------------------------------------------------
+  # higiene geral de arquivos
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+        # markdown usa dois espaços no fim da linha como quebra de linha dura
+        exclude: '\.(md|markdown)$'
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: [--fix=lf]
+        # .bat/.ps1 são CRLF por contrato (.gitattributes e .editorconfig)
+        exclude: '^windows/.*\.(bat|ps1)$'
+      - id: check-yaml
+      - id: check-added-large-files
+        args: [--maxkb=256]
+      - id: check-merge-conflict
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+      - id: detect-private-key
+      - id: forbid-submodules
+
+  # ---------------------------------------------------------------------------
+  # scripts de shell
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/koalaman/shellcheck-precommit
+    rev: v0.11.0
+    hooks:
+      - id: shellcheck
+        # 'warning' e não 'style': os tópicos '$SYS/broker/...' são literais de
+        # propósito (SC2016), e é o Mosquitto que tem que recebê-los assim.
+        args: [-S, warning]
+        files: '\.sh$'
+
+  # ---------------------------------------------------------------------------
+  # invariantes deste repositório
+  # ---------------------------------------------------------------------------
+  - repo: local
+    hooks:
+      - id: ps1-com-bom
+        name: .ps1 com BOM UTF-8 (Windows PowerShell 5.1)
+        entry: ferramentas/verificar_ps1_bom.sh
+        language: script
+        files: '\.ps1$'
+
+      - id: mosquitto-sem-autenticacao
+        name: mosquitto.conf anônimo (o framework não envia credenciais)
+        entry: ferramentas/verificar_mosquitto_conf.sh
+        language: script
+        files: 'mosquitto\.conf$'

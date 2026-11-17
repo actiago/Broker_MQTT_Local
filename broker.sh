@@ -203,7 +203,11 @@ status() {
         echo "FECHADA — o broker não está atendendo (./broker.sh logs)"
     fi
     echo
+    # '$SYS/broker/version' vai literal para o mosquitto_sub: quem expande isso é
+    # o broker, não o shell.
+    # shellcheck disable=SC2016
     echo '--- $SYS/broker/version ---'
+    # shellcheck disable=SC2016
     "$ENGINE" exec "$CONTAINER" \
         mosquitto_sub -h 127.0.0.1 -p "$PORTA" -t '$SYS/broker/version' -C 1 -W 8 2>/dev/null \
         || echo "(sem resposta)"

@@ -46,7 +46,7 @@ WSL) ou edite as linhas 4 e 5 do arquivo.
    [broker] engine: docker compose
    [broker] porta 1883 respondendo em 127.0.0.1.
    [SELFTEST] broker respondendo em 1883 (QoS 1) — ok
-   [broker] broker no ar: mqtt://192.168.0.105:1883 (anônimo — rede de laboratório)
+   [broker] broker no ar: mqtt://192.168.0.10:1883 (anônimo — rede de laboratório)
    ```
 
 4. `windows\broker.bat status` para conferir (`aberta`, versão do Mosquitto e
