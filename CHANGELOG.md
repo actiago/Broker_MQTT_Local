@@ -26,9 +26,6 @@ numeração acompanha o [Versionamento Semântico](https://semver.org/lang/pt-BR
     nativos (`.\dados\`) e a mesma política do container.
 - `.gitattributes` — `.sh`/`.yml`/`.conf`/`.md` em LF e `.bat`/`.ps1` em CRLF,
   para o clone no Windows não quebrar os scripts com `bad interpreter`.
-- `.github/workflows/validar.yml` — CI que roda `bash -n`, `shellcheck -S error`,
-  `docker compose config` (porta padrão e `PORTA_MQTT=1884`) e o parser do
-  PowerShell em `windows/broker.ps1`.
 - `README.md`: **Início rápido** no topo (Linux e Windows), `git clone` com a URL
   real do repositório, tabela de equivalência `broker.sh` ↔ `broker.bat`,
   §"Porta diferente de 1883", firewall do Windows, linha sobre WPA2-Enterprise
