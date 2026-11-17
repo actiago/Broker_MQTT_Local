@@ -216,7 +216,26 @@ status() {
 }
 
 ajuda() {
-    sed -n '7,22p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+    cat <<'FIM'
+Uso: ./broker.sh [comando]        (sem argumento o comando é "up")
+
+  up        sobe o broker (cria/atualiza o container) e valida
+  down      para e remove o container (o volume de dados fica)
+  limpar    remove o container E apaga o volume de dados
+  restart   reinicia o container
+  status    container, porta, versão, self-test QoS 1 e IP
+  teste     autoteste: publica e recebe por QoS 1 dentro do container
+  ip        IP da LAN + as linhas prontas para MQTT.txt e o sketch
+  logs      acompanha os logs (Ctrl+C para sair)
+  shell     abre um shell dentro do container
+  config    mostra a configuração em uso (/mosquitto/config/...)
+  ajuda     esta mensagem
+
+O engine é escolhido sozinho (docker compose, docker-compose, podman compose
+ou podman-compose). Para forçar: COMPOSE="podman-compose" ./broker.sh up
+Porta diferente de 1883: PORTA_MQTT=1884 ./broker.sh up
+No Windows, o equivalente é: windows\broker.bat <comando>
+FIM
 }
 
 case "${1:-up}" in

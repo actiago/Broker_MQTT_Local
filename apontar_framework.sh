@@ -39,7 +39,30 @@ erro() {
 }
 
 uso() {
-    sed -n '7,19p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+    cat <<'FIM'
+Uso: ./apontar_framework.sh [opções]
+
+Por padrão NÃO grava nada (dry-run): mostra o que mudaria no MQTT.txt do
+framework. Só grava com --gravar.
+
+  ./apontar_framework.sh                      # dry-run com o IP da LAN e porta 1883
+  ./apontar_framework.sh --gravar             # grava broker=IP da LAN, porta=1883
+  ./apontar_framework.sh --broker 10.0.0.7 --gravar
+  ./apontar_framework.sh --porta 1884 --gravar
+  ./apontar_framework.sh --topico-dl mot_mqtt_194104/gateway/downlink --gravar
+  ./apontar_framework.sh --framework /caminho/do/Framework_LoRa_MQTT_Survey --gravar
+
+Opções:
+  --broker IP · --porta N · --topico-dl T · --topico-ul T · --qos 0|1
+  --comando N · --medidas N · --tempo S · --framework DIR · --gravar
+
+O que é preservado: comando, nº de medidas, tempo entre pacotes, tópicos e QoS
+continuam iguais, a menos que sejam passados aqui.
+
+Arquivo tocado (8 linhas): 4_N4_Armazenamento/Parametros/MQTT.txt do framework.
+Este script é bash: no Windows, use a tela do framework (rodar.sh setup no
+WSL/Git Bash) ou edite broker/porta por lá.
+FIM
 }
 
 while [ $# -gt 0 ]; do

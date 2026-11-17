@@ -7,6 +7,45 @@ numeração acompanha o [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não publicado]
 
+## [1.1.0] — 2026-11-17
+
+### Adicionado
+
+- **Suporte a Microsoft Windows** em `windows/`:
+  - `windows/broker.bat` + `windows/broker.ps1` — os mesmos comandos do
+    `broker.sh` (`up`, `down`, `limpar`, `restart`, `status`, `teste`, `ip`,
+    `logs`, `shell`, `config`, `ajuda`) via PowerShell, com detecção automática
+    do Compose (`docker compose`, `docker-compose`, `podman`, `podman-compose`),
+    porta alternativa por `PORTA_MQTT`, IP da LAN por `Get-NetRoute`/
+    `Get-NetIPAddress` e self-test QoS 1 dentro do container.
+  - `windows/README_WINDOWS.md` — dois caminhos (Docker Desktop/WSL2 e
+    Mosquitto nativo), firewall do Windows, apontamento do framework/sketch,
+    integração com framework rodando no WSL2 e tabela de problemas comuns.
+  - `windows/mosquitto-windows.conf` + `windows/mosquitto-nativo.bat` —
+    alternativa sem Docker: Mosquitto instalado no Windows, com caminhos
+    nativos (`.\dados\`) e a mesma política do container.
+- `.gitattributes` — `.sh`/`.yml`/`.conf`/`.md` em LF e `.bat`/`.ps1` em CRLF,
+  para o clone no Windows não quebrar os scripts com `bad interpreter`.
+- `.github/workflows/validar.yml` — CI que roda `bash -n`, `shellcheck -S error`,
+  `docker compose config` (porta padrão e `PORTA_MQTT=1884`) e o parser do
+  PowerShell em `windows/broker.ps1`.
+- `README.md`: **Início rápido** no topo (Linux e Windows), `git clone` com a URL
+  real do repositório, tabela de equivalência `broker.sh` ↔ `broker.bat`,
+  §"Porta diferente de 1883", firewall do Windows, linha sobre WPA2-Enterprise
+  (eduroam) e diagnóstico com os casos de Windows/WSL.
+- `.gitignore`: `mosquitto/passwd` (lista de usuários de exemplo) fora do
+  versionamento.
+
+### Corrigido
+
+- `PORTA_MQTT` agora chega ao `docker-compose.yml` (`${PORTA_MQTT:-1883}:1883`):
+  antes, `PORTA_MQTT=1884 ./broker.sh up` fazia o script testar/esperar a 1884
+  enquanto o container publicava 1883 — o `up` falhava depois de 30 s esperando
+  uma porta que nunca abriria.
+- `ajuda` (broker.sh) e `uso` (apontar_framework.sh) deixaram de extrair o texto
+  por número de linha (`sed -n '7,22p'`) e passaram a usar `heredoc`: editar o
+  cabeçalho do script não estraga mais a mensagem de ajuda.
+
 ## [1.0.0] — 2026-11-15
 
 ### Adicionado

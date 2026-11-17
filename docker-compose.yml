@@ -22,8 +22,10 @@ services:
     # 1883: MQTT puro — é a porta que o N3 e o ESP32 usam (MQTT_PORT = 1883).
     # Sem "127.0.0.1:" na frente para aceitar conexões da LAN (o ESP32 não
     # alcança o localhost da máquina).
+    # PORTA_MQTT muda só a porta do HOST (ex.: 1884 quando a 1883 está ocupada);
+    # dentro do container o Mosquitto continua escutando em 1883.
     ports:
-      - "1883:1883"
+      - "${PORTA_MQTT:-1883}:1883"
 
     volumes:
       # Configuração: somente leitura (o container não deve reescrevê-la)
